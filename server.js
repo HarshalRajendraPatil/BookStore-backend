@@ -1,12 +1,21 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-dotenv.config();
-
+import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+
+dotenv.config();
 
 const app = express();
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.use("/api/v1/auth", authRoutes);
 
@@ -17,7 +26,7 @@ mongoose
   .then(() => {
     console.log("Database Successfully Connected...");
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`); // Log the server URL
+      console.log(`Server is running on http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
