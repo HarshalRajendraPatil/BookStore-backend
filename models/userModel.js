@@ -14,6 +14,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a password."],
   },
+  wishlist: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Book",
+    },
+  ],
+  role: {
+    type: String,
+    enum: ["User", "Vendor", "Admin"],
+    default: "User",
+  },
 });
 
 const User = mongoose.model("User", userSchema);
