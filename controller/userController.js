@@ -2,6 +2,75 @@ import User from "../models/userModel.js";
 import Book from "../models/bookModel.js";
 import jwt from "jsonwebtoken";
 
+// Get all users with pagination for infinite loading
+export const getAllUsers = async (req, res) => {
+  const { username, user, seller, page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10
+
+  const query = {};
+  if (username) {
+    query.username = { $regex: username, $options: "i" };
+  }
+
+  if (seller) {
+    query.role = "Vendor";
+  }
+  if (user) {
+    query.role = "User";
+  }
+  try {
+    const users = await User.find(query)
+      .skip((page - 1) * limit) // Pagination: skip the previous pages
+      .limit(Number(limit)); // Limit the number of results
+
+    const totalUsers = await User.countDocuments(query); // Get total count of users
+
+    res.status(200).json({
+      users,
+      totalUsers,
+      totalPages: Math.ceil(totalUsers / limit), // Calculate total pages
+      currentPage: Number(page),
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
+
+// Update a user by ID
+export const updateUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Delete a user by ID
+export const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Add a book to the wishlist
 export const addToWishlist = async (req, res) => {
   const { bookId } = req.body; // Get the book ID from the request body
