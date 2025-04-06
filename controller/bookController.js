@@ -122,7 +122,7 @@ export const getBooksForSeller = async (req, res) => {
       .skip((page - 1) * limit) // Pagination: skip the previous pages
       .limit(Number(limit)); // Limit the number of results
 
-    const totalBooks = await Book.countDocuments(query); // Get total count of books matching the query
+    const totalBooks = await Book.countDocuments(); // Get total count of books matching the query
 
     res.status(200).json({
       books,
