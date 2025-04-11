@@ -107,6 +107,7 @@ export const getAllOrdersForSeller = async (req, res) => {
   try {
     const orders = await Order.find({ sellerId })
       .populate("userId sellerId bookId") // Populate user and book details
+      .sort({ createdAt: -1 }) // Sort by creation date in descending order
       .skip((page - 1) * limit) // Pagination: skip the previous pages
       .limit(Number(limit)); // Limit the number of results
 
@@ -124,11 +125,12 @@ export const getAllOrdersForSeller = async (req, res) => {
 };
 
 export const getAllOrdersForUser = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10
+  const { page = 1, limit = 9 } = req.query; // Default to page 1 and limit 10
   const userId = req.user;
   try {
     const orders = await Order.find({ userId })
       .populate("userId sellerId bookId") // Populate user and book details
+      .sort({ createdAt: -1 }) // Sort by creation date in descending order
       .skip((page - 1) * limit) // Pagination: skip the previous pages
       .limit(Number(limit)); // Limit the number of results
 
@@ -151,6 +153,7 @@ export const getAllOrdersForBook = async (req, res) => {
   try {
     const orders = await Order.find({ bookId })
       .populate("userId sellerId bookId") // Populate user and book details
+      .sort({ createdAt: -1 }) // Sort by creation date in descending order
       .skip((page - 1) * limit) // Pagination: skip the previous pages
       .limit(Number(limit)); // Limit the number of results
 
